@@ -9,7 +9,6 @@ $vecni = new Vecni();
 User::start_session();
 
 $twig = Vecni::twig_loader();
-include_once "etc/configs/settings.ini.php";
 $less = Vecni::less_loader();
 Response::init();
 
