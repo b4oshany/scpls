@@ -38,7 +38,7 @@ class Vecni{
 
     private $vars = array();
     private static $app_route = array();
-    public static $display_error = false;
+    public static $display_error = true;
 
 
     public static function run_config(){
@@ -63,7 +63,7 @@ class Vecni{
         self::$host = $_SERVER["SERVER_NAME"];
         self::$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
         if(self::$host == "localhost"){
-            self::$host = self::$protocol.self::$host.DIRECTORY_SEPARATOR.self::$main_dirname;
+            self::$host = self::$protocol.self::$host."/".self::$main_dirname;
         }else{
             self::$host = self::$protocol.self::$host;
         }

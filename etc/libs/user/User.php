@@ -1,8 +1,7 @@
 <?php
 namespace libs\user;
 require_once ".autoload.php";
-use configs\Vecni;
-use libs\mongodb\Model;
+use libs\vecni\Object;
 use libs\schedule\Calendar;
 
 /**
@@ -21,7 +20,7 @@ use libs\schedule\Calendar;
 * @method log_out() - logout the current user
 */
 
-class User extends Model{
+class User extends Object{
     public static $collection = "user";
 
     protected $password;        // password of user
@@ -34,30 +33,6 @@ class User extends Model{
     public $dob;                // user date of birth
 
     /**
-    * __callstatic is triggered when invoking inaccessible methods in an static context
-    * This method will initiate the mongodb connection and select the desired database
-    * In addition, it will initiate the collection model for the user data.
-    */
-    public static function setUp(){
-        parent::setUp();
-        $collection = self::$collection;
-        self::$model = self::$mongodb->$collection;
-    }
-
-    /**
-    * Set the collection settings for monogodb
-    * such as the unique attributes in the collection
-    */
-    public static function collectionSettings(){
-        self::$mongodb->user->createIndex(
-            array("username"=>1,
-                  "email"=>1
-                 ),
-            array("unique"=>1)
-        );
-    }
-
-    /**
     * Login user with their normal user account
     * @param string $email - email to be used for login
     * @password string $password - password to be used for login
@@ -65,13 +40,8 @@ class User extends Model{
     * false if there was an error during login
     */
     public static function login($email, $password){
-        $user = self::find_one(array("email"=>$email,
-                                         "password"=>md5($password)
-                                         ),
-                                      array("password" => 0)
-                                     );
+        # TODO: get user information from the database.
         if(!empty($user)){
-            $user->update(array('$set'=>array("is_login"=>true)));
             $user->is_login = true;
             return self::start_session($user->to_array());
         }else{
@@ -87,28 +57,12 @@ class User extends Model{
     * false if their was a error or failure to do soundex
     */
     public function register($email, $password){
-        $user_exist = self::$model->findOne(array('email'=>$email));
-        if(empty($user_exist)){
-            $this->email = $email;
-        }else{
-            return 0;
-        }
-        $this->password = md5($password);
-        $this->is_login = true;
-        $this->is_admin = false;
-        $this->status = "new";
-        $this->date_joined = new \DateTime("NOW");
-        $user_id = (string) $this->save();
-        $this->id = $user_id;
+        // TODO: Store user information in database.
+        // TODO: Retrieve user information from database and set it to object.
         if(self::start_session($this->to_array())){
             return 1;
         }
         return 0;
-    }
-
-    public function enforce_constraints(){
-        $this->dob = self::cast("DateTime", (array) $this->dob);
-        $this->date_joined = self::cast("DateTime", (array) $this->date_joined);
     }
 
     /**
@@ -123,11 +77,9 @@ class User extends Model{
     * and the session has started else false if their is any login failure
     */
     public function login_with_social_network($email, $account_type, $account_id){
-        $user_exist = self::$model->findOne(array('email'=>$email));
+        #Todo: Fetch user informatin.
+        $user_exist = null;
         if(!empty($user_exist)){
-            self::$model->update(array("email"=>$email),
-                                array('$set'=>array($account_type=>$account_id)
-                                     ));
             $this->populate($user_exist);
             $this->$account_type = $account_id;
             $this->id = $user_exist["_id"];
@@ -214,46 +166,10 @@ class User extends Model{
         if(isset($_SESSION['uid'])){
             $user = self::get_current_user_db();
             unset($_SESSION['uid']);
-            $user->update(array('$set'=>array("is_login"=>false)));
             return 1;
         }
         return 0;
     }
-
-    /**
-    * Get the default calendar for the current user
-    * @param array $query - mongodb query creteria to be used to fetch user calendar
-    * @param Calendar - user default calendar
-    */
-    public function get_default_calendar(){
-        $calendar = Calendar::find_one(
-            array(
-                "creator"=>$this->get_MongoId(),
-                "title"=>"General"
-            )
-        );
-        if(!empty($calendar)){
-            return $calendar;
-        }else{
-            $calendar = Calendar::create("General");
-            $calendar->create_event("My Birthday", $this->dob, "Happy Birthday $this->first_name");
-            return $calendar;
-        }
-    }
-
-    /**
-    * Get all of the current user calendars
-    * @param array $query - condition to get all user calendars
-    * @return array - list of Calendar object for the current user
-    */
-    public function get_calendars(array $query = null){
-        if(!isset($query)){
-            $query = array("creator"=>$this->get_MongoId());
-        }
-        return Calendar::find($query);
-    }
 }
 
-User::setUp();
-User::collectionSettings();
 ?>

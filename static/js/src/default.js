@@ -14,22 +14,6 @@ function flash_notification(message, status){
     }, 5000);
 }
 
-/*$('#password').keyup(function(e){
-    if(!validatePassword(this.value)){
-        this.style.outline = '1px solid red';
-    }else{
-        this.style.outline = 'none';
-    }
-});*/
-
-/*$("input[type='email'']").blur(function(){
-    if(!validateEmail(this.value)){
-        this.style.outline = '1px solid red';
-    }else{
-        this.style.outline = 'none';
-    }
-})*/
-
 $("[name='register'][type='button']").click(function(){
     $("#login-register form.login").hide("slow");
     $("#login-register .modal-title").html("Register");

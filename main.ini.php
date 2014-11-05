@@ -1,12 +1,9 @@
 <?php
 # define package usage
-use libs\user\User;
-use libs\university\University;
-use libs\university\Faculty;
 use libs\vecni\Response;
 use libs\vecni\Request;
 use libs\vecni\Vecni;
-use libs\schedule\Calendar;
+use libs\user\User;
 
 $vecni = new Vecni();
 User::start_session();
