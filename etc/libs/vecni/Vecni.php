@@ -152,14 +152,14 @@ class Vecni{
         */
         if($app_route == null){
             krsort(self::$app_route);
-            $path = $_SERVER['REQUEST_URI'];
+            $path = urldecode($_SERVER['REQUEST_URI']);
             if(self::$host."/" != self::$protocol.$_SERVER["SERVER_NAME"].$path){
                 unset(self::$app_route["/"]);
             }
             // Search for the respective url dispatching function.
             foreach(self::$app_route as $url => $app_route){
                 $url_regex = str_replace('/', '\/', $url);
-                $url_regexpr = preg_replace("/\{.+?\}/", "\w+", $url_regex);
+                $url_regexpr = preg_replace("/\{.+?\}/", ".+", $url_regex);
                 $result = preg_match("/".$url_regexpr.'\/?\??.*$'."/", $path);
                 // If an unique id is found and has a unique variable id,
                 // set it to a GET request.
