@@ -9,7 +9,6 @@ $vecni = new Vecni();
 User::start_session();
 
 $twig = Vecni::twig_loader();
-$less = Vecni::less_loader();
 Response::init();
 
 # added global variables to twig
@@ -20,42 +19,46 @@ if(User::is_login()){
     $twig->addGlobal("user", User::get_current_user());
 }
 
+$books = array(
+    array("author"=>"Oshane Bailey", "book_title"=>"Vecni", "genre"=>"Technology", "cover_photo"=>"http://www.technaturals.com/wp-content/uploads/2013/08/Technology.jpg"),
+    array("author"=>"Andrelle Thompson", "book_title"=>"Marco", "genre"=>"Literature", "cover_photo"=>"http://c.tadst.com/gfx/600x400/galician-literature-day-spain.jpg?1"),
+    array("author"=>"Eric NeedHam", "book_title"=>"Best Arts Practises", "genre"=>"Arts and Recreation", "cover_photo"=>"http://www.designindaba.com/sites/default/files/node/page/23/IMG_3015.jpg"),
+    array("author"=>"Cloyde McBeth", "book_title"=>"Programming For Dummies", "genre"=>"Computer Science", "cover_photo"=>"http://bobchoat.files.wordpress.com/2014/06/where-is-technology-heading.jpg"),
+    array("author"=>"Marc Lynch", "book_title"=>"Work Ethics", "genre"=>"Genera Work", "cover_photo"=>"http://artsonthepeninsula.files.wordpress.com/2012/08/we-value-the-arts1.jpg"),
+    array("author"=>"Neil Armstrong", "book_title"=>"Around The Globe", "genre"=>"Geography", "cover_photo"=>"http://sd.keepcalm-o-matic.co.uk/i/keep-calm-and-study-geography-113.png"),
+    array("author"=>"Alifumike Adedipe", "book_title"=>"World War I", "genre"=>"History", "cover_photo"=>"http://www.dpcdsb.org/NR/rdonlyres/22300638-C9FC-439B-8040-A7C4A2C5D7EC/87305/history.gif"),
+    array("author"=>"Gwen Stephanie", "book_title"=>"Patois Bible", "genre"=>"Language", "cover_photo"=>"https://coe.hawaii.edu/sites/default/files/Letter%20Tree.jpg"),
+    array("author"=>"Mike Will", "book_title"=>"New Moon", "genre"=>"Philosophy", "cover_photo"=>"http://www.ithaca.edu/depts/i/Philosophy/28473_photo.jpg"),
+    array("author"=>"Cathy Underwood", "book_title"=>"Mind Dynamics", "genre"=>"Psychology", "cover_photo"=>"http://www.ithaca.edu/depts/i/Philosophy/28473_photo.jpg"),
+    array("author"=>"Will Smith", "book_title"=>"Steam Turbines", "genre"=>"Technology", "cover_photo"=>"http://3.bp.blogspot.com/-YFPIfvj7h0M/U6OD1EglnOI/AAAAAAAACdY/VEqw1DlqTy4/s1600/technology44-743413.png"),
+    array("author"=>"Aca Cop", "book_title"=>"Islam a Religion or Excuse", "genre"=>"Religion", "cover_photo"=>"http://kenanmalik.files.wordpress.com/2013/08/religion-praying.jpg?w=800"),
+    array("author"=>"Dean Jones", "book_title"=>"Islam a Religion or Excuse", "genre"=>"Art and Recreation", "cover_photo"=>"http://www.ronnestam.com/wp-content/uploads/2013/03/design-thinking.jpg")
+);
+
 #allow call to static functions
 function staticCall($class, $function, $args = array()){
     if (class_exists($class) && method_exists($class, $function))
         return call_user_func_array(array($class, $function), $args);
     return null;
 }
+
 $twig->addFunction('staticCall', new Twig_Function_Function('staticCall'));
 
-# compile css less files
-$css_file = dirname(Vecni::$main_dir)
-                      .DIRECTORY_SEPARATOR.Vecni::$css_dir
-                      .DIRECTORY_SEPARATOR."gen"
-                      .DIRECTORY_SEPARATOR."style.css";
-$less_file = dirname(Vecni::$main_dir)
-                      .DIRECTORY_SEPARATOR.Vecni::$css_dir
-                      .DIRECTORY_SEPARATOR."less"
-                      .DIRECTORY_SEPARATOR."style.less";
-$style = $less->compileFile($less_file);
-if(file_exists($css_file)){
-    unlink($css_file);
-}
-$fp = fopen($css_file, 'w');
-fwrite($fp, $style);
-fclose($fp);
-chmod($css_file, 0777);
 
-/**
-Welcome:
-    Navigational view that renders the welcome page to the user.
-    This function is the default fall back function that
-    have been registered in the system by default.
-*/
+function book_search($book_key, $book_value){
+    global $books;
+    foreach($books as $book){
+        if($book[$book_key] == $book_value){
+            return $book;
+        }
+    }
+    return null;
+}
+
 Vecni::set_route("/", "welcome");
 Vecni::set_route("/home", "welcome");
 function welcome(){
-    global $twig;
+    global $twig, $books;
     if(User::is_login()){
         return $twig->render("home.html",
                     array(
@@ -65,11 +68,68 @@ function welcome(){
         return $twig->render('home.html',
                       array(
                         "html_class"=>"welcome",
-                        "title"=>Vecni::$BRAND_NAME
+                        "title"=>Vecni::$BRAND_NAME,
+                        "books"=>$books
                       )
                   );
     }
 }
+
+
+Vecni::set_route("/books/{book_title}", "book_view");
+function book_view(){
+    global $twig, $books;
+    $book_title = Request::GET("book_title");
+    $book = book_search("book_title", $book_title);
+    return $twig->render('book.html',
+                  array(
+                    "html_class"=>"book",
+                    "title"=>"$book_title",
+                    "book"=>$book
+                  )
+              );
+}
+
+
+Vecni::set_route("/genre/{genre}", "genre_view");
+function genre_view(){
+    global $twig, $books;
+    $genre = Request::GET("genre");
+    $category_books = array();
+    foreach($books as $book){
+        if($book["genre"] == $genre){
+            array_push($category_books, $book);
+        }
+    }
+    return $twig->render('home.html',
+                  array(
+                    "html_class"=>"book",
+                    "title"=>"$genre",
+                    "books"=>$category_books
+                  )
+              );
+}
+
+
+Vecni::set_route("/author/{author}", "author_view");
+function author_view(){
+    global $twig, $books;
+    $author = Request::GET("genre");
+    $author_books = array();
+    foreach($books as $book){
+        if($book["author"] == $author){
+            array_push($author_books, $book);
+        }
+    }
+    return $twig->render('home.html',
+                  array(
+                    "html_class"=>"book",
+                    "title"=>"$author",
+                    "books"=>$author_books
+                  )
+              );
+}
+
 
 /**
 * Sign in page for users

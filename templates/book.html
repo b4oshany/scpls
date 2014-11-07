@@ -1,0 +1,59 @@
+{% extends 'home.html' %} {% block maincontent %}
+<style>
+  #book_cover {
+    width: 100%;
+  }
+  .book-main {
+    text-align: center;
+    min-height: 30px;
+  }
+  #book-showcase .btn-group {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
+  #book-showcase {
+    position: relative;
+  }
+  .card{
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  .no-padding{
+    padding: 0;
+  }
+</style>
+<div class="col-md-9">
+  <div class="row card no-padding" id="book-showcase">
+    <div class="col-md-5">
+      <img id="book_cover" src="{{book.cover_photo}}" />
+    </div>
+    <div class="col-md-7 book-main">
+      <h1>{{book.book_title}}</h1>
+      <h4>by <a href="{{host}}/author/{{book.author}}">{{book.author}}</a></h4>
+      <h4>genre {{book.genre}}</h4>
+    </div>
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary">Rate It</button>
+      <button type="button" class="btn btn-primary">Request Book for Loan</button>
+    </div>
+  </div>
+  <div class="row card">
+    <div class="col-md-12">
+      <h3>Summary</h3>
+      <p>Nam se quid cernantur in senserit eu nulla proident. Ubi expetendis
+      coniunctione, noster commodo arbitrantur, ne cernantur adipisicing o ut irure
+      possumus nam duis iis commodo hic noster, si legam hic quae nam o qui cillum
+      sint quorum, minim quibusdam a quorum dolore. Se aute arbitrantur ut de cillum
+      voluptate occaecat. Id cupidatat non fabulas ad laborum quid cernantur
+        mandaremus, a aliqua expetendis pariatur e consequat malis duis probant elit.</p>
+      <p>
+      Minim proident do officia. Aliqua sed doctrina si mandaremus ipsum elit
+      consequat enim sed nam an voluptatibus, ea quamquam eu mandaremus ab quae ex
+      incurreret, aliquip lorem quibusdam voluptate, elit id admodum o est sint amet
+      ab incurreret. Se magna officia ex aliqua laborum qui transferrem. Aliqua ubi
+        officia id dolore, sed minim admodum sempiternum.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
