@@ -20,9 +20,12 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a href="#">
-            <span class="glyphicon glyphicon-search"></span>
-          </a>
+          <form class="form-inline" role="form" style="padding: 8px;" method="post" action="{{host}}/books">
+            <div class="form-group">
+              <input type="search" class="form-control" name="q" placeholder="Search for..." value="{{search}}">
+            </div>
+            <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-search"></span></button>
+          </form>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -37,9 +40,12 @@
               <span>Member since Nov. 2014</span>
             </div>
             <ul class="nav nav-pills quick-pick">
-              <li><a href="#">My Home</a></li>
-              <li><a href="#">Watch List</a></li>
-              <li><a href="#">Settings</a></li>
+              <li><a href="#">My Home</a>
+              </li>
+              <li><a href="#">Watch List</a>
+              </li>
+              <li><a href="#">Settings</a>
+              </li>
             </ul>
             <div class="fn-profile">
               <button type="button" class="btn btn-default">View Profile</button>
@@ -48,6 +54,8 @@
           </section>
         </li>
       </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container-fluid -->
 </header>

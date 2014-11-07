@@ -1,0 +1,27 @@
+{% extends 'home.html' %}
+{% block maincontent %}
+  <h1>{{title}}</h1>
+  {% for book in books %}
+    <article class="col-md-3">
+      <div class="galery">
+        <h4 class="menu-galery">
+          {{book.book_title}}
+        </h4>
+        <section class="image-galery">
+          <a class="group" rel="group1" href="{{host}}/books/{{book.book_title}}">
+            <img src="{{book.cover_photo}}">
+          </a>
+        </section>
+        <section class="property-summary">
+          <ul class="list-group">
+            <li class="list-group-item">
+              by <a href="{{host}}/author/{{book.author}}" class="owner">{{book.author}}</a>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </article>
+  {% endfor %}
+{% endblock %}
+
+
