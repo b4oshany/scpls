@@ -1,6 +1,9 @@
 {% extends 'home.html' %}
 {% block maincontent %}
   <h1>{{title}}</h1>
+{% if html_class == "author" %}
+<p>{{description}}</p>
+{% endif %}
   {% for book in books %}
     <article class="col-md-3">
       <div class="galery">
