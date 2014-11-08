@@ -241,7 +241,7 @@ class Vecni{
         self::$db = null;
     }
 
-    public static function redirect($url = "welcome"){
+    public static function redirect($url = "home"){
         ?>
             <script>
                 window.location.assign("<?php echo self::$host."/".$url ?>");
