@@ -1,5 +1,12 @@
 Description
 -----------
+SCPLS - St Catherine Parish Library System
+
+Just a basic School Project
+
+
+Powered By [Vecni]
+----------------
 
 [Vecni] is a light-weight PHP micro-framework that utilizes url dispatching to server files instead of
 filesystem url resolution. It utilizes Twig, which is equivalent to Python Jinja2 templates for advance template
