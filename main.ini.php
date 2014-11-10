@@ -54,6 +54,7 @@ Welcome:
     have been registered in the system by default.
 */
 Vecni::set_route("/", "welcome");
+Vecni::set_route("/home", "welcome");
 function welcome(){
     global $twig;
     if(User::is_login()){
@@ -77,7 +78,7 @@ function welcome(){
 Vecni::set_route("/signin", "signin_require");
 function signin_require($message=""){
     global $twig;
-    return $twig->render('signin.php',
+    return $twig->render('user_signin.html',
               array(
                 "html_class"=>"signin",
                 "title"=>"Signin Required",
@@ -95,7 +96,13 @@ function reg_request($message=""){
     if(User::is_login()){
         Vecni::redirect();
     }
-    return $twig->render('registration.php');
+    return $twig->render('user_registration.html',
+              array(
+                "html_class"=>"signin",
+                "title"=>"Signin Required",
+                "message"=>$message
+              )
+          );
 }
 
 /**

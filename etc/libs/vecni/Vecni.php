@@ -2,8 +2,9 @@
 namespace libs\vecni;
 require_once "__autoload.php";
 require_once "Response.php";
+require_once "Object.php";
 
-class Vecni{
+class Vecni extends Object{
     /*
     *    Section 1.1 Comapny Information
     *    The following lines below consisit of the company detailed information which is used across this website
@@ -38,7 +39,6 @@ class Vecni{
 
     private $vars = array();
     private static $app_route = array();
-    public static $display_error = true;
 
 
     public static function run_config(){
@@ -76,15 +76,17 @@ class Vecni{
         return false;
     }
 
-    public static function enable_error_reporting(){
-        if(self::in_development() && self::$display_error){
+    public static function enable_error_reporting($display_error = true){
+        if(self::in_development() && $display_error){
             error_reporting(E_ALL);
             ini_set('display_errors',1);
             require_once(self::$libs_dir.DIRECTORY_SEPARATOR.'error'.DIRECTORY_SEPARATOR.
                          'src'.DIRECTORY_SEPARATOR.'php_error.php');
             \php_error\reportErrors();
+            ini_set('html_errors',1);
+        }else{
+            ini_set('display_errors',0);
         }
-        ini_set('html_errors',1);
     }
 
     public static function twig_loader(){
@@ -241,11 +243,39 @@ class Vecni{
         self::$db = null;
     }
 
-    public static function redirect($url = "home"){
+    public static function redirect($url = "/home", $async=false, $title=""){
+        $url = self::$host.$url;
+        if(!$async){
         ?>
             <script>
-                window.location.assign("<?php echo self::$host."/".$url ?>");
+                window.location.assign("<?php echo $url; ?>");
             </script>
+        <?php
+        }else{
+            $data = array("page"=>$title);
+        ?>
+            <script>
+                history.replaceState(<?php echo json_encode($data).", \"$title\", \"$url\""; ?>);
+                document.title = <?php echo "'$title'"; ?>;
+            </script>
+        <?php
+        }
+    }
+
+
+    public static function reload(){
+        ?>
+        <script>
+            window.location.reload();
+        </script>
+        <?php
+     }
+
+    public static function nav_back(){
+        ?>
+        <script>
+            window.history.back();
+        </script>
         <?php
     }
 

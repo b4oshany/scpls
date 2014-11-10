@@ -21,14 +21,12 @@ class Response{
         return json_encode($message);
     }
 
-    public static function abort($message = null){
+    public static function abort($message = "Something went wrong"){
         header("Connection: close", true);
-        if(!empty($message)){
-            if(Request::is_async()){
-                header("Message: $message");
-            }else{
-                echo $message;
-            }
+        if(Request::is_async()){
+            header("Message: $message");
+        }else{
+            echo $message;
         }
         header("HTTP/1.0 404 Not Found");
     }

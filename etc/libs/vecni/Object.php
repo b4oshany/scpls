@@ -78,9 +78,10 @@ class Object{
      * @param object $object
      * @return object
      */
-    public function populate($object){
+    public function populate($object, $strictness = false){
         foreach($object as $key => $value){
-            $this->$key = $value;
+            if(!$strictness || property_exists($this, $key))
+                $this->$key = $value;
         }
     }
 }
