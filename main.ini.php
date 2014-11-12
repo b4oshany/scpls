@@ -19,34 +19,6 @@ if(User::is_login()){
     $twig->addGlobal("user", User::get_current_user());
 }
 
-$books = array(
-    array("author"=>"Oshane Bailey", "book_title"=>"Vecni", "genre"=>"Technology", "cover_photo"=>"http://www.technaturals.com/wp-content/uploads/2013/08/Technology.jpg", "ratings"=>4, "date_added"=> (time() - 1032)),
-    array("author"=>"Andrelle Thompson", "book_title"=>"Marco", "genre"=>"Literature", "cover_photo"=>"http://c.tadst.com/gfx/600x400/galician-literature-day-spain.jpg?1", "ratings"=>3.5, "date_added"=> (time() - 2232)),
-    array("author"=>"Eric Needham", "book_title"=>"Best Arts Practises", "genre"=>"Arts and Recreation", "cover_photo"=>"http://www.designindaba.com/sites/default/files/node/page/23/IMG_3015.jpg", "ratings"=>4.5, "date_added"=> (time() - 32)),
-    array("author"=>"Cloyde McBeth", "book_title"=>"Programming For Dummies", "genre"=>"Computer Science", "cover_photo"=>"http://bobchoat.files.wordpress.com/2014/06/where-is-technology-heading.jpg", "ratings"=>4, "date_added"=> (time() - 12)),
-    array("author"=>"Marc Lynch", "book_title"=>"Work Ethics", "genre"=>"Genera Work", "cover_photo"=>"http://artsonthepeninsula.files.wordpress.com/2012/08/we-value-the-arts1.jpg", "ratings"=>2.5, "date_added"=> (time() - 132)),
-    array("author"=>"Neil Armstrong", "book_title"=>"Around The Globe", "genre"=>"Geography", "cover_photo"=>"http://sd.keepcalm-o-matic.co.uk/i/keep-calm-and-study-geography-113.png", "ratings"=>3, "date_added"=> (time() - 1932)),
-    array("author"=>"Alifumike Adedipe", "book_title"=>"World War I", "genre"=>"History", "cover_photo"=>"http://www.dpcdsb.org/NR/rdonlyres/22300638-C9FC-439B-8040-A7C4A2C5D7EC/87305/history.gif", "ratings"=>3, "date_added"=> (time() - 1932)),
-    array("author"=>"Gwen Stephanie", "book_title"=>"Patois Bible", "genre"=>"Language", "cover_photo"=>"https://coe.hawaii.edu/sites/default/files/Letter%20Tree.jpg", "ratings"=>4, "date_added"=> (time() - 12)),
-    array("author"=>"Mike Will", "book_title"=>"New Moon", "genre"=>"Philosophy", "cover_photo"=>"http://www.ithaca.edu/depts/i/Philosophy/28473_photo.jpg", "ratings"=>4, "date_added"=> (time() - 121032)),
-    array("author"=>"Cathy Underwood", "book_title"=>"Mind Dynamics", "genre"=>"Psychology", "cover_photo"=>"http://www.ithaca.edu/depts/i/Philosophy/28473_photo.jpg", "ratings"=>3, "date_added"=> (time() - 1032)),
-    array("author"=>"Will Smith", "book_title"=>"Steam Turbines", "genre"=>"Technology", "cover_photo"=>"http://3.bp.blogspot.com/-YFPIfvj7h0M/U6OD1EglnOI/AAAAAAAACdY/VEqw1DlqTy4/s1600/technology44-743413.png", "ratings"=>4, "date_added"=> (time() - 1032)),
-    array("author"=>"Aca Cop", "book_title"=>"Islam a Religion or Excuse", "genre"=>"Religion", "cover_photo"=>"http://kenanmalik.files.wordpress.com/2013/08/religion-praying.jpg?w=800", "ratings"=>2, "date_added"=> (time() - 10)),
-    array("author"=>"Dean Jones", "book_title"=>"Mastering UI Design", "genre"=>"Arts and Recreation", "cover_photo"=>"http://www.ronnestam.com/wp-content/uploads/2013/03/design-thinking.jpg", "ratings"=>5, "date_added"=> (time() - 1032))
-);
-
-$authors =  array(
-    "Oshane Bailey"=>"Summis fabulas efflorescere. Admodum minim dolor aut lorem. Aut ex summis
-    admodum, o cupidatat imitarentur sed minim ne a sunt occaecat, incurreret sunt
-    dolor iudicem quis, veniam e iudicem ut ipsum, sed cillum ipsum et fabulas o eu
-    anim firmissimum, a quae labore qui proident. Appellat transferrem est voluptate
-    eu excepteur quid cernantur voluptate.",
-    "Eric Needham"=>"Quorum qui se dolor incurreret ea e elit officia coniunctione. Ne lorem de duis
-    ita quo deserunt efflorescere ad voluptate nisi quid non quis et ea dolor
-    laborum praetermissum iis appellat quorum laborum eu cupidatat sunt qui
-    quibusdam arbitrantur e an fugiat instituendarum an elit id iis duis quibusdam.
-    Legam ubi in elit quamquam, nulla expetendis transferrem."
-);
 
 #allow call to static functions
 function staticCall($class, $function, $args = array()){
@@ -57,6 +29,18 @@ function staticCall($class, $function, $args = array()){
 
 $twig->addFunction('staticCall', new Twig_Function_Function('staticCall'));
 
+
+function get_books(){
+    $books = file_get_contents("books");
+    $books = json_decode($books);
+    return $books;
+}
+
+function get_authors(){
+    $authors = file_get_contents("books");
+    $authors = json_decode($authors);
+    return $authors;
+}
 
 function book_search($book_key, $book_value){
     global $books;
@@ -214,10 +198,21 @@ function book_list(){
 }
 
 
+Vecni::set_error_route("error404");
+function error404(){
+    if(!Request::is_async()){
+        global $twig;
+        return $twig->render('404.html');
+    }else{
+        return "404 - Not Found";
+    }
+}
+
+
 /**
 * Sign in page for users
 */
-Vecni::set_route("/signin", "signin_require");
+Vecni::set_route("/user/signin", "signin_require");
 function signin_require($message=""){
     global $twig;
     return $twig->render('user_signin.html',
@@ -230,67 +225,79 @@ function signin_require($message=""){
 }
 
 /**
+* Sign in processing for users
+*/
+Vecni::set_route("/user/signin/process", "process_login");
+function process_login(){
+    if(!empty($_POST['email']) && !empty($_POST['password'])){
+        $email = $_POST['email'];
+        $pass = $_POST['password'];
+        $status = User::login($email, $pass);
+        if(Request::is_async()){
+            if($status){
+                return Response::json_response(200, $email);
+            }else{
+                return Response::abort("$email, does not exists in our system. Please register for account if you don't have one");
+            }
+        }else{
+            if($status){
+                Vecni::nav_back();
+            }else{
+                signin_require();
+            }
+        }
+    }
+}
+
+
+/**
 * Registration page for users
 */
-Vecni::set_route("/registration", "reg_request");
+Vecni::set_route("/user/registration", "reg_request");
 function reg_request($message=""){
     global $twig;
     if(User::is_login()){
         Vecni::redirect();
     }
     return $twig->render('user_registration.html',
-              array(
-                "html_class"=>"signin",
-                "title"=>"Signin Required",
-                "message"=>$message
-              )
-          );
+                        array("html_class"=>"user-registration",
+                             "title"=>"Registration",
+                             )
+                        );
 }
-
-/**
-* Sign in processing for users
-*/
-Vecni::set_route("/procsignin", "process_login");
-function process_login(){
-    if(!empty($_POST['email']) && !empty($_POST['password'])){
-        $email = $_POST['email'];
-        $pass = $_POST['password'];
-        $status = User::login($email, $pass);
-        if($status){
-            return Response::json_response(200, $email);
-        }else{
-            return Response::abort("$email, does not exists in our system. Please register for account if you don't have one");
-        }
-    }
-}
-
 
 /**
 * Registration processing for users
 */
-Vecni::set_route("/procregister", "register");
+Vecni::set_route("/user/registration/process", "register");
 function register(){
     global $user;
-    if($first_name = Request::POST('first_name') && $last_name =  Request::POST('last_name') && $password = Request::POST('password') && $email = Request::POST('email')){
+    if(($first_name = Request::POST('first_name')) &&
+       ($last_name =  Request::POST('last_name')) &&
+       ($password = Request::POST('password')) &&
+       ($email = Request::POST('email'))){
         $new_user = new User();
         $new_user->first_name = $first_name;
         $new_user->last_name = $last_name;
-        $new_user->email = $email;
         if($dob = Request::POST('dob')){
-            $new_user->dob  = DateTime::createFromFormat('m/d/Y',
-                                           $dob);
+            $new_user->dob  = $dob;
         }else{
-            $new_user->dob = new DateTime("NOW");
+            $new_user->dob = "0000-00-00";
         }
-        $new_user->gender = Request::POST('gender');
-        if($school = Request::POST('school')){
-            $new_user->school = $school;
-        }
+        $new_user->gender = Request::POST('gender', "other");
         $status = $new_user->register($email, $password);
-        if($status){
-            return Response::json_response(200, $email);
+        if(Request::is_async()){
+            if($status){
+                return Response::json_response(200, $email);
+            }else{
+                return Response::abort("This accound has already been registered");
+            }
         }else{
-            return Response::abort("$email, does not exists in our system. Please register for account if you don't have one");
+            if($status){
+                Vecni::redirect();
+            }else{
+                Vecni::redirect();
+            }
         }
     }
 }
@@ -339,6 +346,7 @@ function log_out(){
     }
     Vecni::redirect();
 }
+
 
 ?>
 
