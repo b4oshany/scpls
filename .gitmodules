@@ -10,3 +10,6 @@
 [submodule "etc/libs/error"]
         path = etc/libs/error
         url = git@github.com:JosephLenton/PHP-Error.git
+[submodule "static/ext/sweetalert"]
+	path = static/ext/sweetalert
+	url = git@github.com:t4t5/sweetalert.git

@@ -2,7 +2,8 @@
 namespace libs\user;
 require_once ".autoload.php";
 use libs\vecni\Object;
-use libs\schedule\Calendar;
+use libs\mysql\PDOConnector;
+use libs\vecni\Vecni;
 
 /**
 * @package user
@@ -21,10 +22,7 @@ use libs\schedule\Calendar;
 */
 
 class User extends Object{
-    public static $collection = "user";
-
-    protected $password;        // password of user
-    public $username;           // username of user
+    public $user_id;           // username of user
     public $first_name;         // user first name
     public $last_name;          // user last name
     public $email;              // user email
@@ -40,7 +38,12 @@ class User extends Object{
     * false if there was an error during login
     */
     public static function login($email, $password){
-        # TODO: get user information from the database.
+        $sql = "select * from user_profile where user_id = (select user_id from users where email = '$email' and password = md5('$password'))";
+        $user = new static();
+        $stmt = PDOConnector::$db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $user->populate($result);
         if(!empty($user)){
             $user->is_login = true;
             return self::start_session($user->to_array());
@@ -57,8 +60,12 @@ class User extends Object{
     * false if their was a error or failure to do soundex
     */
     public function register($email, $password){
-        // TODO: Store user information in database.
-        // TODO: Retrieve user information from database and set it to object.
+        PDOConnector::connect();
+        $sql = "call addUser('$email', '$password', '$this->first_name', '$this->last_name', '$this->gender', '$this->dob')";
+        $stmt = PDOConnector::$db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $this->populate($result);
         if(self::start_session($this->to_array())){
             return 1;
         }
@@ -118,7 +125,7 @@ class User extends Object{
     */
     public static function get_current_user(){
         if(isset($_SESSION['uid'])){
-            return self::load($_SESSION['uid']);
+            return self::object_cast($_SESSION['uid']);
         }else{
             return null;
         }
@@ -130,7 +137,7 @@ class User extends Object{
     */
     public static function get_current_user_id(){
         if(isset($_SESSION['uid'])){
-            return $_SESSION['uid']["id"];
+            return $_SESSION['uid']["user_id"];
         }
     }
 
@@ -171,5 +178,4 @@ class User extends Object{
         return 0;
     }
 }
-
 ?>
