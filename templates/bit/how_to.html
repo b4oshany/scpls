@@ -1,0 +1,29 @@
+<div class="tab-pane" id="howtouse">
+  <section class="sec-header">
+    <h3 class="font-bree-serif">Link Css</h3>
+    <p>Move the <strong>plugin CSS</strong> file to your server and link to it in the
+      <code><abbr title="&lt;head&gt;">head</abbr></code>
+      section of your document.
+    </p>
+    <pre class="prettyprint linenums">
+      <ol class="linenums">
+      <li class="L0"><span class="tag">&lt;link</span><span class="pln"> </span><span class="atn">rel</span><span class="pun">=</span><span class="atv">"stylesheet"</span><span class="pln"> </span><span class="atn">href</span><span class="pun">=</span><span class="atv">"yourplugin.css"</span><span class="pln"> </span><span class="tag">/&gt;</span></li></ol></pre>
+  </section>
+  <section class="sec-header">
+    <h3 class="font-bree-serif">Link JS</h3>
+    <p>Move the <strong>plugin JS</strong> file to your server and link to it before the closing <code><abbr title="&lt;body&gt;">body</abbr></code> tag.</p>
+    <p>Please note that you must include jQuery (v1.7 or later) before the slider JS file.</p>
+    <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="tag">&lt;script</span><span class="pln"> </span><span class="atn">src</span><span class="pun">=</span><span class="atv">"jquery-1.7.1.min.js"</span><span class="tag">&gt;&lt;/script&gt;</span></li><li class="L1"><span class="tag">&lt;script</span><span class="pln"> </span><span class="atn">src</span><span class="pun">=</span><span class="atv">"jquery.yourplugin.min.js"</span><span class="tag">&gt;&lt;/script&gt;</span></li></ol></pre>
+  </section>
+  <section class="sec-header">
+    <h3 class="font-bree-serif">The Markup</h3>
+    <p>Add the following markup</p>
+    <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="tag">&lt;ul</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"thumbnails"</span><span class="tag">&gt;</span></li><li class="L1"><span class="tag">&lt;li</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"span4"</span><span class="tag">&gt;</span><span class="pln"> </span><span class="tag">&lt;a</span><span class="pln"> </span><span class="atn">href</span><span class="pun">=</span><span class="atv">"#"</span><span class="pln"> </span><span class="atn">class</span><span class="pun">=</span><span class="atv">"thumbnail"</span><span class="tag">&gt;</span><span class="pln"> </span><span class="tag">&lt;img</span><span class="pln"> </span><span class="atn">src</span><span class="pun">=</span><span class="atv">"http://placehold.it/360x268"</span><span class="pln"> </span><span class="atn">alt</span><span class="pun">=</span><span class="atv">""</span><span class="tag">&gt;</span><span class="pln"> </span><span class="tag">&lt;/a&gt;</span><span class="pln"> </span><span class="tag">&lt;/li&gt;</span></li><li class="L2"><span class="pln">....</span></li><li class="L3"><span class="tag">&lt;/ul&gt;</span></li></ol></pre>
+  </section>
+  <section class="sec-header">
+    <h3 class="font-bree-serif">Call Plugin</h3>
+    <p>Just before the closing <code><abbr title="&lt;body&gt;">body</abbr></code> tag (after any JS file includes), call the plugin with code below:</p>
+    <pre class="prettyprint linenums"><ol class="linenums"><li class="L0"><span class="tag">&lt;script&gt;</span></li><li class="L1"><span class="pln">$</span><span class="pun">(</span><span class="pln">document</span><span class="pun">).</span><span class="pln">ready</span><span class="pun">(</span><span class="kwd">function</span><span class="pln"> </span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span></li><li class="L2"><span class="pln">  $</span><span class="pun">(</span><span class="str">'.selector'</span><span class="pun">).</span><span class="pln">yourPlugin</span><span class="pun">();</span></li><li class="L3"><span class="pun">});</span></li><li class="L4"><span class="tag">&lt;/script&gt;</span></li></ol></pre>
+  </section>
+</div>
+<!--end howtouse-content-->
