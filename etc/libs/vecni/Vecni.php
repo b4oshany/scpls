@@ -288,7 +288,6 @@ class Vecni extends Object{
         }catch(Exception $e){
             return;
         }
-
     }
 }
 

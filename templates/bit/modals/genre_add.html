@@ -1,0 +1,30 @@
+{% import "macros/forms_extend.html" as extend_forms %}
+{% import "macros/forms.html" as forms %}
+<div class="modal fade" id="genre_add_modal" role="dialog" >
+  <div class="modal-dialog">
+    <form name="genre_registration" id="genre_registration" method="post" action="{{host}}/genre/add/process" class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Add Book Category</h4>
+      </div>
+      <div class="modal-body">
+        <label>Class/Genre Name
+          <div class="form-group input-group">
+            <span class="input-group-addon noCurve"><div class="glyphicon glyphicon-calendar"  ></div></span>
+            {{forms.input("genre", 'placeholder="Book Genre"', "span2 noCurve",  "full-width")}}
+          </div>
+        </label>
+        <label>Class/Genre Index
+          <div class="form-group input-group">
+            <span class="input-group-addon noCurve"><div class="glyphicon glyphicon-calendar"  ></div></span>
+            {{forms.input("genre_id", 'placeholder="Book Genre Index", max=999', "span2 noCurve",  "full-width", "number")}}
+          </div>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

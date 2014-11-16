@@ -33,18 +33,9 @@
             <section>Book Categories</section>
           </div>
           <ul class="nav nav-tabs nav-stacked">
-            <li><a id="marts" href="{{host}}/genre/Arts and Recreation"> Arts and Recreation</a></li>
-            <li><a id="mcomputer" href="{{host}}/genre/Computer Science"> Computer Science</a></li>
-            <li><a id="mgeneral" href="{{host}}/genre/General Work"> General Work</a></li>
-            <li><a id="mgeography" href="{{host}}/genre/Geography"> Geography</a></li>
-            <li><a id="mhistory" href="{{host}}/genre/History"> History</a></li>
-            <li><a id="mlanguage" href="{{host}}/genre/Language"> Language</a></li>
-            <li><a id="mliterature" href="{{host}}/genre/Literature"> Literature</a></li>
-            <li><a id="mphilosophy" href="{{host}}/genre/Philosophy"> Philosophy</a></li>
-            <li><a id="psychology" href="{{host}}/genre/Psychology"> Psychology</a></li>
-            <li><a id="mreligion" href="{{host}}/genre/Religion"> Religion</a></li>
-            <li><a id="msocial" href="{{host}}/genre/Social Science"> Social Science</a></li>
-            <li><a id="mtechnology" href="{{host}}/genre/Technology"> Technology</a></li>
+            {% for genre in genres %}
+            <li><a id="marts" href="{{host}}/genre/{{genre.genre_id}}/{{genre.genre}}"> {{genre.genre}}</a></li>
+            {% endfor %}
           </ul>
         </div>
       </div>

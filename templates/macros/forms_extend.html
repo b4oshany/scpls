@@ -1,0 +1,43 @@
+{% import "forms.html" as forms %}
+
+{% macro genre_select(name="genre_id", with_add_link=true) %}
+    <div class="form-group input-group">
+      <span class="input-group-addon noCurve"><div class="glyphicon glyphicon-tower"  ></div></span>
+      <select class="form-control select_genre" name="{{name}}" id="select_genre">
+          {% set open_tag = true %}
+          {% set previous_class = 0 %}
+          {% set current_class = 0 %}
+          {% for genre in genres %}
+            {% set current_class = genre.genre_id|round(-2) %}
+            {% if current_class != previous_class %}
+                {% set previous_class = genre.genre_id|round(-2) %}
+                {% set open_tag = true %}
+                </optgroup>
+            {% endif %}
+            {% if open_tag %}
+                <optgroup label="{{genre.genre}}">
+                {% set open_tag = false %}
+                {% set current_class = genre.genre_id|round(-2) %}
+            {% endif %}
+            <option value="{{genre.genre_id}}">{{genre.genre_id}} - {{genre.genre}}</option>
+          {% endfor %}
+      </select>
+    </div>
+    {% if with_add_link %}
+        <div style="text-align: right">
+          <a href="#" data-toggle="modal" data-target="#genre_add_modal">Add a new genre.</a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+            if(this.genre_id%100 == 0){
+               if($opt_group != undefined)
+                  $genre_opt.append($opt_group);
+               $opt_group = $("<optgroup></optgroup>");
+               $opt_group.attr("label", this.genre);
+            }
+            $opt = $("<option></option>");
+            $opt.val(this.genre_id);
+            $opt.text(this.genre);
+            $opt_group.append($opt);
