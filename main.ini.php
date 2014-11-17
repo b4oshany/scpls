@@ -36,43 +36,44 @@ function staticCall($class, $function, $args = array()){
 
 $twig->addFunction('staticCall', new Twig_Function_Function('staticCall'));
 
-
-function book_search($book_key, $book_value){
-    global $books;
-    foreach($books as $book){
-        if($book[$book_key] == $book_value){
-            return $book;
-        }
-    }
-    return null;
-}
-
 Vecni::set_route("/", "welcome");
 Vecni::set_route("/home", "welcome");
 function welcome(){
-    global $twig, $books;
-    if(User::is_login()){
-        return $twig->render("home.html",
-                    array(
-                        "html_class"=>"welcome"
-                    ));
-    }else{
-        return $twig->render('home.html',
-                      array(
-                        "html_class"=>"welcome",
-                        "title"=>Vecni::$BRAND_NAME,
-                        "books"=>$books
-                      )
-                  );
-    }
+    global $twig;
+    $sql = "SELECT books.* , genre, CONCAT(first_name,  ' ', last_name) AS author FROM books LEFT JOIN authors ON authors.author_id = books.author_id LEFT JOIN genres ON genres.genre_id = books.genre_id";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    $books = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    return $twig->render('home.html',
+                  array(
+                    "html_class"=>"welcome",
+                    "title"=>Vecni::$BRAND_NAME,
+                    "books"=>$books
+                  )
+              );
 }
 
+function book_search($text, $id=null){
+    $sql = "select * from book_information  where book_title like '%$text%' or author_id = $id or author like '%World War I%' or book_id = $id or genre like '%$text%' or genre_id = $id";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
 
-Vecni::set_route("/books/{book_title}", "book_view");
+function book_by_id($id){
+    $sql = "select * from book_information where book_id = $id";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetch(\PDO::FETCH_ASSOC);
+}
+
+Vecni::set_route("/books/view/{book_id}/{book_title}", "book_view");
 function book_view(){
-    global $twig, $books;
+    global $twig;
     $book_title = Request::GET("book_title");
-    $book = book_search("book_title", $book_title);
+    $book_id = Request::GET("book_id");
+    $book = book_by_id($book_id);
     return $twig->render('book.html',
                   array(
                     "html_class"=>"book",
@@ -97,7 +98,7 @@ Vecni::set_route("/book/process/add", "book_registration");
 function book_registration(){
     if(($book_title = Request::POST("book_title")) &&
        ($author = Request::POST("author")) &&
-       ($genre = Request::POST("genre_id"))
+       ($genre_id = Request::POST("genre_id"))
       ){
         $name = explode(" ", $author);
         $first_name = $name[0];
@@ -105,6 +106,7 @@ function book_registration(){
             $last_name = $name[1];
         else
             $last_name = "";
+        $cover = Request::POST("cover_photo", Vecni::$host."/static/img/photo/default_book_cover.jpg");
         $sql = "Select author_id from authors where first_name = '$first_name' and last_name = '$last_name'";
         $stmt = PDOConnector::$db->prepare($sql);
         $stmt->execute();
@@ -115,13 +117,9 @@ function book_registration(){
             $stmt->execute();
             $author_id = PDOConnector::$db->lastInsertId();
         }
-        $sql2 = "insert into books(book_title, author_id, genre_id) values(:book_title, :author_id, :genre_id)";
+        $sql3 = "insert into books(book_title, author_id, genre_id, cover_photo) values('$book_title', $author_id, $genre_id, '$cover')";
         $stmt = PDOConnector::$db->prepare($sql3);
-        $stmt->execute(array(
-            ':book_title'=>$book_title,
-            ':author_id'=>author_id,
-            ':genre_id'=>genre_id
-        ));
+        $stmt->execute();
         $author_id = PDOConnector::$db->lastInsertId();
         return $author_id;
     }
@@ -155,6 +153,9 @@ function genre_add_process(){
     if(($genre = Request::POST("genre")) &&
        ($genre_id = Request::POST("genre_id"))
     ){
+        if(!is_int($genre_id)){
+            return Response::abort("Genre ID must be number");
+        }
         $sql = "INSERT INTO genres(genre_id, genre) VALUES($genre_id, '$genre')";
         PDOConnector::$db->exec($sql);
         $stmt = PDOConnector::$db->prepare("select * from genres");
