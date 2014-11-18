@@ -68,6 +68,13 @@ function book_by_id($id){
     return $stmt->fetch(\PDO::FETCH_ASSOC);
 }
 
+function book_by_genre($genre, $id=""){
+    $sql = "select * from book_information where genre = 'genre' or genre_id = $id";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
 Vecni::set_route("/books/view/{book_id}/{book_title}", "book_view");
 function book_view(){
     global $twig;
@@ -131,12 +138,7 @@ function genre_view(){
     global $twig, $books;
     $genre = Request::GET("genre");
     $genre_id = Request::GET("genre_id");
-    $category_books = array();
-    foreach($books as $book){
-        if($book["genre"] == $genre){
-            array_push($category_books, $book);
-        }
-    }
+    $category_books = book_by_genre($genre, $genre_id);
     return $twig->render('book_filter.html',
                   array(
                     "html_class"=>"book",
