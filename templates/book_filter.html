@@ -11,14 +11,14 @@
           {{book.book_title}}
         </h4>
         <section class="image-galery">
-          <a class="group" rel="group1" href="{{host}}/books/{{book.book_title}}">
+          <a class="group" rel="group1" href="{{host}}/books/view/{{book.book_id}}/{{book.book_title}}">
             <img src="{{book.cover_photo}}">
           </a>
         </section>
         <section class="property-summary">
           <ul class="list-group">
             <li class="list-group-item">
-              by <a href="{{host}}/author/{{book.author}}" class="owner">{{book.author}}</a>
+              by <a href="{{host}}/author/view/{{book.author_id}}/{{book.author}}" class="owner">{{book.author}}</a>
             </li>
           </ul>
         </section>

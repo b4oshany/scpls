@@ -8,16 +8,16 @@
           {% set previous_class = 0 %}
           {% set current_class = 0 %}
           {% for genre in genres %}
-            {% set current_class = genre.genre_id|round(-2) %}
+            {% set current_class = genre.genre_id|round(-2, 'floor') %}
             {% if current_class != previous_class %}
-                {% set previous_class = genre.genre_id|round(-2) %}
+                {% set previous_class = genre.genre_id|round(-2, 'floor') %}
                 {% set open_tag = true %}
                 </optgroup>
             {% endif %}
             {% if open_tag %}
                 <optgroup label="{{genre.genre}}">
                 {% set open_tag = false %}
-                {% set current_class = genre.genre_id|round(-2) %}
+                {% set current_class = genre.genre_id|round(-2, 'floor') %}
             {% endif %}
             <option value="{{genre.genre_id}}">{{genre.genre_id}} - {{genre.genre}}</option>
           {% endfor %}

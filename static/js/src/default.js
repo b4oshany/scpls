@@ -44,3 +44,7 @@ function show_tab(element){
     $(element).tab("show");
 }
 
+$(document).on("click", ".genre_dropdown", function(e){
+    $(this).siblings("ul").slideToggle();
+})
+

@@ -74,7 +74,14 @@ function book_by_id($id){
 }
 
 function book_by_genre($genre, $id=""){
-    $sql = "select * from book_information where genre = 'genre' or genre_id = $id";
+    $sql = "select * from book_information where genre = '$genre' or genre_id = $id";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+function book_by_author($author, $id=""){
+    $sql = "select * from book_information where author = '$author' or author_id = $id";
     $stmt = PDOConnector::$db->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -169,7 +176,7 @@ function genre_view(){
                     "html_class"=>"book",
                     "title"=>"Books in $genre - genre",
                     "books"=>$category_books,
-                    "menu_active"=>"genre/$genre"
+                    "menu_active"=>"genre/view/$genre_id/$genre"
                   )
               );
 }
@@ -180,9 +187,6 @@ function genre_add_process(){
     if(($genre = Request::POST("genre")) &&
        ($genre_id = Request::POST("genre_id"))
     ){
-        if(!is_int($genre_id)){
-            return Response::abort("Genre ID must be number");
-        }
         $sql = "INSERT INTO genres(genre_id, genre) VALUES($genre_id, '$genre')";
         PDOConnector::$db->exec($sql);
         $stmt = PDOConnector::$db->prepare("select * from genres");
@@ -190,20 +194,25 @@ function genre_add_process(){
         $genres = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return Response::json_feed($genres);
     }
+    return Response::abort("No genre or genre_id was given.");
 }
 
 
-Vecni::set_route("/author/{author}", "author_view");
+Vecni::set_route("/author/view/{author_id}/{author}", "author_view");
 function author_view(){
-    global $twig, $books, $authors;
+    global $twig;
     $author = Request::GET("author");
-    $author_books = array();
-    foreach($books as $book){
-        if($book["author"] == $author){
-            array_push($author_books, $book);
-        }
-    }
-    $description=$authors[$author];
+    $author_id = Request::GET("author_id");
+    $author_books = book_by_author($author, $author_id);
+    $description="Appellat in summis consequat, mandaremus duis ullamco se duis domesticarum
+consequat enim expetendis id quo fore commodo. Admodum nam nisi voluptate, si
+varias tamen ea senserit. Quid incididunt o lorem quis. Sed incurreret an
+offendit, an velit adipisicing, appellat ex cernantur o dolor nescius eu
+arbitrantur, ubi minim domesticarum, a ita sint cupidatat, sed dolore quamquam
+domesticarum de iis summis ita enim. Commodo eram incididunt, elit ne fabulas in
+enim appellat eu duis velit, et sed quem quibusdam. Iudicem si magna, aut elit
+laborum occaecat non de ita imitarentur, dolor officia id nisi malis. Mandaremus
+hic pariatur.";
     return $twig->render('book_filter.html',
                   array(
                     "html_class"=>"author",
@@ -219,12 +228,10 @@ function author_view(){
 Vecni::set_route("/recent", "recent_view");
 function recent_view(){
     global $twig, $books;
-    $recent_books = array();
-    foreach($books as $book){
-        if((time() - 1000) < $book["date_added"]){
-            array_push($recent_books, $book);
-        }
-    }
+    $sql = "select * from book_information order by date_added limit 15";
+    $stmt = PDOConnector::$db->prepare($sql);
+    $stmt->execute();
+    $recent_books = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     return $twig->render('book_filter.html',
                   array(
                     "html_class"=>"book",

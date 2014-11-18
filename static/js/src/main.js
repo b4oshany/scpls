@@ -31,13 +31,6 @@ function show_tab(element){
     $(element).tab("show");
 }
 
-/*$("#remote-modal").on('show.bs.modal', function (e) {
-    var url = e.relatedTarget.getAttribute("href");
-    if(url == undefined)
-        url = e.relatedTarget.getAttribute("data-remote");
-    console.log(url);
-    $("#remote-modal").load("welcome");
-});*/
 $.fn.bootstrapValidator.validators.enabled = {
     validate: function(validator, $field, options) {
         return true;

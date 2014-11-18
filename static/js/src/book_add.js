@@ -17,6 +17,8 @@ $(document).ready(function(){
             $opt.text(this.genre_id+" - "+this.genre);
             $opt_group.append($opt);
          });
+         if($opt_group != undefined)
+            $genre_opt.append($opt_group);
          $('#genre_add_modal').modal('hide');
       });
       return false;
