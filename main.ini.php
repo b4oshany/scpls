@@ -40,7 +40,7 @@ Vecni::set_route("/", "welcome");
 Vecni::set_route("/home", "welcome");
 function welcome(){
     global $twig;
-    $sql = "SELECT books.* , genre, CONCAT(first_name,  ' ', last_name) AS author FROM books LEFT JOIN authors ON authors.author_id = books.author_id LEFT JOIN genres ON genres.genre_id = books.genre_id";
+    $sql = "select * from book_information";
     $stmt = PDOConnector::$db->prepare($sql);
     $stmt->execute();
     $books = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -55,7 +55,12 @@ function welcome(){
 }
 
 function book_search($text, $id=null){
-    $sql = "select * from book_information  where book_title like '%$text%' or author_id = $id or author like '%World War I%' or book_id = $id or genre like '%$text%' or genre_id = $id";
+    if(!empty($id)){
+        $id_search = "or author_id = $id or book_id = $id or genre_id = $id";
+    }else{
+        $id_search = "";
+    }
+    $sql = "select * from book_information  where book_title like '%$text%' or author like '%$text%' or genre like '%$text%' $id_search";
     $stmt = PDOConnector::$db->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -88,6 +93,26 @@ function book_view(){
                     "book"=>$book
                   )
               );
+}
+
+Vecni::set_route("/books", "book_list");
+function book_list(){
+    global $twig, $books;
+    $list_books = array();
+    if($search = Request::Post("q")){
+        $list_books = book_search($search);
+        return $twig->render('book_filter.html',
+                  array(
+                    "html_class"=>"book",
+                    "title"=>"Results for $search",
+                    "books"=>$list_books,
+                    "search"=>$search,
+                    "menu_active"=>"popular"
+                  )
+              );
+    }else{
+        Vecni::redirect();
+    }
 }
 
 Vecni::set_route("/book/add", "book_add");
@@ -228,32 +253,6 @@ function popular_view(){
                     "menu_active"=>"popular"
                   )
               );
-}
-
-Vecni::set_route("/books", "book_list");
-function book_list(){
-    global $twig, $books;
-    $list_books = array();
-    if($search = Request::Post("q")){
-        $searchq = strtolower($search);
-        foreach($books as $book){
-            $result = (strrpos(strtolower(" ".$book["book_title"]), $searchq) || strrpos(strtolower(" ".$book["author"]), $searchq) || strrpos(" ".strtolower($book["genre"]), $searchq));
-            if($result !== false) {
-                array_push($list_books, $book);
-            }
-        }
-        return $twig->render('book_filter.html',
-                  array(
-                    "html_class"=>"book",
-                    "title"=>"Results for $search",
-                    "books"=>$list_books,
-                    "search"=>$search,
-                    "menu_active"=>"popular"
-                  )
-              );
-    }else{
-        Vecni::redirect();
-    }
 }
 
 
